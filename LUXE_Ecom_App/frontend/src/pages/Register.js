@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { register } from "../apis/AuthApi";
 
 function Register() {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ function Register() {
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({
@@ -17,16 +19,24 @@ function Register() {
     });
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    
-    // MOCK BACKEND
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    users.push(form);
-    localStorage.setItem("users", JSON.stringify(users));
-    
-    alert("Register Success!");
-    navigate("/login");
+    setLoading(true);
+
+    try {
+      await register(form);
+      alert("Register Success!");
+      navigate("/login");
+    } catch (error) {
+      console.error("Register failed", error);
+      if (error.response?.status === 409) {
+        alert("A user with this email already exists.");
+      } else {
+        alert("Unable to register. Check your details and try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -65,8 +75,11 @@ function Register() {
             className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20"
           />
 
-          <button className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500">
-            Register
+          <button
+            disabled={loading}
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 disabled:opacity-60"
+          >
+            {loading ? "Creating account..." : "Register"}
           </button>
         </form>
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { login } from "../apis/AuthApi";
 
 function Login() {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ function Login() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({
@@ -18,22 +20,30 @@ function Login() {
     });
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    // MOCK BACKEND
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const user = users.find(u => u.email === form.email && u.password === form.password);
-
-    if (user) {
+    try {
+      const response = await login(form);
+      const user = response.data;
       localStorage.setItem("user", JSON.stringify(user));
       alert("Login Successful!");
-      navigate("/catalog");
-    } else {
-      // Allow fallback login for demo purposes
-      localStorage.setItem("user", JSON.stringify({ email: form.email, name: "Demo User" }));
-      alert("Demo Login Successful!");
-      navigate("/catalog");
+
+      if (user.role === "ADMIN") {
+        navigate("/admin");
+      } else {
+        navigate("/catalog");
+      }
+    } catch (error) {
+      console.error("Login failed", error);
+      if (error.response?.status === 401) {
+        alert("Invalid email or password.");
+      } else {
+        alert("Unable to login. Check your credentials and try again.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -78,8 +88,11 @@ function Login() {
             </button>
           </div>
 
-          <button className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 text-white">
-            Login
+          <button
+            disabled={loading}
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 disabled:opacity-60"
+          >
+            {loading ? "Signing in..." : "Login"}
           </button>
         </form>
 
