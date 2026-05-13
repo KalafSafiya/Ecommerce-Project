@@ -1,4 +1,4 @@
-# 🛍️ LUXE - Online Clothing Store
+# 🛍️ UpOutfits - Online Clothing Store
 
 ## 📌 Project Overview
 **LUXE** is an online clothing store web application developed as a partial completion of the **IT 3232 module**.  
