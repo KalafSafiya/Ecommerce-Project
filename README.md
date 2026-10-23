@@ -1,4 +1,4 @@
-# 🛍️ UpOutfits - Online Clothing Store
+# 🛍️ Luxe - Online Clothing Store
 
 ## 📌 Project Overview
 **UPOutfits** is an online clothing store web application developed as a partial completion of the **IT 3232 module**.  
